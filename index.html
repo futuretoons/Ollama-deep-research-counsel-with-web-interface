@@ -1,0 +1,803 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limerita AI</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'VT323', monospace;
+            background: #000000 no-repeat center center fixed;
+            background-size: cover;
+            color: #00ff41;
+            overflow-x: hidden;
+        }
+
+        /* CRT Screen Effect */
+        .crt::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.27861; }
+            5% { opacity: 0.34769; }
+            10% { opacity: 0.23604; }
+            15% { opacity: 0.90626; }
+            20% { opacity: 0.18128; }
+            25% { opacity: 0.83891; }
+            30% { opacity: 0.65583; }
+            35% { opacity: 0.67807; }
+            40% { opacity: 0.26559; }
+            45% { opacity: 0.84693; }
+            50% { opacity: 0.96019; }
+            55% { opacity: 0.08594; }
+            60% { opacity: 0.20313; }
+            65% { opacity: 0.71988; }
+            70% { opacity: 0.53455; }
+            75% { opacity: 0.37288; }
+            80% { opacity: 0.71428; }
+            85% { opacity: 0.70419; }
+            90% { opacity: 0.7003; }
+            95% { opacity: 0.36108; }
+            100% { opacity: 0.24387; }
+        }
+
+        .terminal-glow {
+            text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5), 0 0 40px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .neon-border {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, inset 0 0 10px rgba(0, 255, 65, 0.1);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
+        }
+
+        .cyan-neon {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+
+        .magenta-neon {
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+        }
+
+        .yellow-neon {
+            color: #ffff00;
+            text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00;
+        }
+
+        .scanline {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scanline::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 65, 0.3);
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .blink {
+            animation: blink-animation 1s steps(2, start) infinite;
+        }
+
+        @keyframes blink-animation {
+            to { visibility: hidden; }
+        }
+
+        .pixel-corners {
+            clip-path: polygon(
+                0 8px, 8px 8px, 8px 0,
+                calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
+                100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
+                8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+            );
+        }
+
+        .scrollbar-retro::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .scrollbar-retro::-webkit-scrollbar-track {
+            background: #000000;
+            border: 1px solid #00ff41;
+        }
+
+        .scrollbar-retro::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            border: 1px solid #000000;
+        }
+
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            5% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            10% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            15% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            20% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            25% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            30% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            35% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            40% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            45% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            50% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            55% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            60% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            65% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            70% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            75% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            80% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            85% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            90% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            95% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+            100% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+        }
+
+        .retro-btn {
+            position: relative;
+            background: #000000;
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px #00ff41;
+        }
+
+        .retro-btn:hover {
+            background: #00ff41;
+            color: #000000;
+            box-shadow: 0 0 20px #00ff41;
+            text-shadow: none;
+        }
+
+        .retro-btn:active {
+            transform: scale(0.95);
+        }
+
+        .retro-btn:disabled {
+            border-color: #003311;
+            color: #003311;
+            cursor: not-allowed;
+            text-shadow: none;
+        }
+
+        .progress-bar {
+            background: #000000;
+            border: 2px solid #00ff41;
+            height: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                #00ff41,
+                #00ff41 10px,
+                #00cc33 10px,
+                #00cc33 20px
+            );
+            box-shadow: 0 0 10px #00ff41;
+            animation: progress-slide 1s linear infinite;
+        }
+
+        @keyframes progress-slide {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+		
+		.top-of-page{
+			padding-top: 2%;
+		}
+		
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .vote-bar {
+            background: #000000;
+            border: 1px solid #00ff41;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+            margin: 4px 0;
+        }
+		.brain-gif{
+			height: 75px;
+		}
+
+        .vote-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #00cc33);
+            box-shadow: 0 0 10px #00ff41;
+            transition: width 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="crt">
+    <div class="starfield">
+        <script>
+            function createStars() {
+                const starfield = document.querySelector('.starfield');
+                for (let i = 0; i < 200; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.width = star.style.height = `${Math.random() * 2 + 1}px`;
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.top = `${Math.random() * 100}%`;
+                    star.style.animationDelay = `${Math.random() * 5}s`;
+                    starfield.appendChild(star);
+                }
+            }
+            createStars();
+        </script>
+    </div>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const App = () => {
+            const [models, setModels] = useState([]);
+            const [selectedModel, setSelectedModel] = useState('');
+            const [topic, setTopic] = useState('');
+            const [mode, setMode] = useState('single');
+            const [numMembers, setNumMembers] = useState(2);
+            const [isResearching, setIsResearching] = useState(false);
+            const [results, setResults] = useState([]);
+            const [sources, setSources] = useState([]);
+            const [votes, setVotes] = useState([]);
+            const [memory, setMemory] = useState(null);
+            const [chats, setChats] = useState([]);
+            const [selectedChat, setSelectedChat] = useState(null);
+            const [showSettings, setShowSettings] = useState(false);
+            const [showMemory, setShowMemory] = useState(false);
+            const [showChats, setShowChats] = useState(false);
+            const [currentAgent, setCurrentAgent] = useState('');
+            const [progress, setProgress] = useState(0);
+            const resultsRef = useRef(null);
+            const resultsEndRef = useRef(null);
+
+            useEffect(() => {
+                fetch('/api/models')
+                    .then(res => res.json())
+                    .then(data => {
+                        setModels(data.models);
+                        if (data.models.length > 0) setSelectedModel(data.models[0]);
+                    });
+                loadMemory();
+                loadChats();
+            }, []);
+
+            const loadMemory = () => {
+                fetch('/api/memory')
+                    .then(res => res.json())
+                    .then(data => setMemory(data));
+            };
+
+            const loadChats = () => {
+                fetch('/api/chats')
+                    .then(res => res.json())
+                    .then(data => setChats(data.chats || []));
+            };
+
+            useEffect(() => {
+                if (!isResearching) return;
+
+                const interval = setInterval(() => {
+                    fetch('/api/status')
+                        .then(res => res.json())
+                        .then(data => {
+                            setProgress(data.progress);
+                            setCurrentAgent(data.current_agent);
+                            setResults(data.results);
+                            setSources(data.sources);
+                            setVotes(data.votes || []);
+                            if (!data.is_researching && data.progress === 100) {
+                                setIsResearching(false);
+                                loadMemory();
+                                loadChats();
+                            }
+                        });
+                }, 500);
+
+                return () => clearInterval(interval);
+            }, [isResearching]);
+
+            const handleStartResearch = () => {
+                if (!topic.trim()) return;
+
+                setIsResearching(true);
+                setResults([]);
+                setSources([]);
+                setVotes([]);
+                setProgress(0);
+                setSelectedChat(null);
+
+                fetch('/api/research', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        topic, 
+                        model: selectedModel, 
+                        mode, 
+                        num_members: numMembers 
+                    })
+                });
+            };
+
+            const viewChat = (chat) => {
+                setSelectedChat(chat);
+                setResults(chat.results);
+                setSources(chat.sources);
+                setVotes(chat.votes || []);
+            };
+
+            const scrollToBottom = () => {
+                resultsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            return (
+                <div class="top-of-page">
+                    <div className="max-w-7xl mx-auto">
+                        {/* Header */}
+                        <div className="neon-border bg-black/50 p-6 mb-4 terminal-glow">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="text-6xl"><img src="static\brain.gif" class="brain-gif" /></div>
+                                    <div>
+                                        <h1 className="text-5xl font-bold neon-text glitch" data-text="LIMERITA DEEP RESEARCH">
+                                            LIMERITA DEEP RESEARCH
+                                        </h1>
+                                        <p className="text-2xl cyan-neon">v2.1.2025 // OLLAMA MULTI-AGENT COUNSEL + VOTING </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setShowChats(!showChats)}
+                                        className="retro-btn text-2xl"
+                                        title="Past Missions"
+                                    >
+                                        📡
+                                    </button>
+                                    <button
+                                        onClick={() => setShowMemory(!showMemory)}
+                                        className="retro-btn text-2xl"
+                                        title="Memory Bank"
+                                    >
+                                        ◈
+                                    </button>
+                                    <button
+                                        onClick={() => setShowSettings(!showSettings)}
+                                        className="retro-btn text-2xl"
+                                        title="Configuration"
+                                    >
+                                        ⚙
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Settings Panel */}
+                            {showSettings && (
+                                <div className="neon-border bg-black/80 p-4 mb-4">
+                                    <h3 className="text-3xl cyan-neon mb-3">&gt;&gt; SYSTEM CONFIG</h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="block text-2xl neon-text mb-1">[ MODEL ]</label>
+                                            <select
+                                                value={selectedModel}
+                                                onChange={(e) => setSelectedModel(e.target.value)}
+                                                className="w-full bg-black neon-border text-2xl neon-text p-2"
+                                                style={{fontFamily: 'VT323, monospace'}}
+                                            >
+                                                {models.map(model => (
+                                                    <option key={model} value={model}>{model}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-2xl neon-text mb-1">[ MODE ]</label>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => setMode('counsel')}
+                                                    className={'flex-1 p-2 neon-border transition-all text-2xl ' + (mode === 'counsel' ? 'bg-green-900/50 border-green-500 text-green-300' : 'bg-black border-green-800 text-green-600')}
+                                                >
+                                                    👥 Counsel
+                                                </button>
+                                                <button
+                                                    onClick={() => setMode('single')}
+                                                    className={'flex-1 p-2 neon-border transition-all text-2xl ' + (mode === 'single' ? 'bg-green-900/50 border-green-500 text-green-300' : 'bg-black border-green-800 text-green-600')}
+                                                >
+                                                    ⚡ Single Pass
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {mode === 'counsel' && (
+                                            <div>
+                                                <label className="block text-2xl neon-text mb-1">[ COUNSEL MEMBERS ]</label>
+                                                <input
+                                                    type="range"
+                                                    min="2"
+                                                    max="6"
+                                                    value={numMembers}
+                                                    onChange={(e) => setNumMembers(parseInt(e.target.value))}
+                                                    className="w-full h-6 bg-black neon-border appearance-none"
+                                                />
+                                                <div className="flex justify-between text-xl mt-1">
+                                                    <span>2</span>
+                                                    <span>3</span>
+                                                    <span>4</span>
+                                                    <span>5</span>
+                                                    <span>6</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Memory Panel */}
+                            {showMemory && memory && (
+                                <div className="neon-border bg-black/80 p-4 mb-4 max-h-96 overflow-y-auto scrollbar-retro">
+                                    <h3 className="text-3xl magenta-neon mb-3">&gt;&gt; MEMORY BANK</h3>
+                                    
+                                    <div className="mb-4">
+                                        <h4 className="text-2xl yellow-neon mb-2">// USER PROFILE</h4>
+                                        <div className="text-xl space-y-1 pl-4">
+                                            <p><span className="cyan-neon">INTERESTS:</span> {memory.user_profile.interests.join(', ') || 'NONE'}</p>
+                                            <p><span className="cyan-neon">TOPICS:</span> {memory.user_profile.previous_topics.slice(-5).join(', ') || 'NONE'}</p>
+                                            <p><span className="cyan-neon">LAST UPDATE:</span> {memory.user_profile.last_updated || 'NEVER'}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <h4 className="text-2xl yellow-neon mb-2">// RESEARCH SESSIONS [{memory.research_sessions.length}]</h4>
+                                        <div className="space-y-2 pl-4">
+                                            {memory.research_sessions.slice(-5).reverse().map((session, idx) => (
+                                                <div key={idx} className="border border-cyan-500/30 p-2 bg-black/50">
+                                                    <p className="text-xl"><span className="cyan-neon">ID:</span> {session.id} | <span className="cyan-neon">TOPIC:</span> {session.topic}</p>
+                                                    <p className="text-lg"><span className="cyan-neon">AGENTS:</span> {session.agents.join(', ')}</p>
+                                                    <p className="text-lg"><span className="cyan-neon">FINDINGS:</span> {session.findings.length} | <span className="cyan-neon">SOURCES:</span> {session.sources.length}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="text-2xl yellow-neon mb-2">// KNOWLEDGE BASE</h4>
+                                        <div className="text-xl pl-4">
+                                            {Object.keys(memory.knowledge_base).length > 0 ? (
+                                                Object.entries(memory.knowledge_base).map(([topic, data], idx) => (
+                                                    <p key={idx}><span className="cyan-neon">{topic}:</span> {Object.keys(data).length} entries</p>
+                                                ))
+                                            ) : (
+                                                <p className="text-red-500">NO DATA</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Past Chats Panel */}
+                            {showChats && (
+                                <div className="neon-border bg-black/80 p-4 mb-4 max-h-96 overflow-y-auto scrollbar-retro">
+                                    <h3 className="text-3xl magenta-neon mb-3">&gt;&gt; PAST MISSIONS</h3>
+                                    <div className="space-y-2">
+                                        {chats.slice(-10).reverse().map((chat, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => viewChat(chat)}
+                                                className="w-full text-left p-3 bg-black/50 neon-border hover:bg-green-900/30 transition-all text-xl"
+                                            >
+                                                <span className="cyan-neon">[ {chat.timestamp} ]</span> {chat.topic} 
+                                                <span className="ml-2 yellow-neon">({chat.mode} {chat.mode === 'counsel' ? `- ${chat.num_members} members` : ''})</span>
+                                                {chat.votes && chat.votes.length > 0 && <span className="ml-2">🗳️</span>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Input */}
+                            <div className="flex gap-2">
+                                <div className="flex-1 relative">
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-3xl neon-text">&gt;</span>
+                                    <input
+                                        type="text"
+                                        value={topic}
+                                        onChange={(e) => setTopic(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleStartResearch()}
+                                        placeholder="ENTER RESEARCH TOPIC..."
+                                        disabled={isResearching}
+                                        className="w-full bg-black neon-border text-2xl neon-text p-3 pl-12 disabled:opacity-50"
+                                        style={{fontFamily: 'VT323, monospace'}}
+                                    />
+                                </div>
+                                <button
+                                    onClick={handleStartResearch}
+                                    disabled={isResearching || !topic.trim()}
+                                    className="retro-btn px-8 text-2xl"
+                                >
+                                    {isResearching ? '◉ PROCESSING...' : '▶ LAUNCH'}
+                                </button>
+                            </div>
+
+                            {/* Progress */}
+                            {isResearching && (
+                                <div className="mt-4">
+                                    <div className="flex justify-between text-xl mb-1">
+                                        <span className="cyan-neon">{currentAgent}</span>
+                                        <span className="yellow-neon">[{Math.round(progress)}%]</span>
+                                    </div>
+                                    <div className="progress-bar">
+                                        <div
+                                            className="progress-fill"
+                                            style={{ width: progress + '%' }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            {/* Results */}
+                            <div className="lg:col-span-2 neon-border bg-black/50 terminal-glow">
+                                <div className="p-4 border-b-2 border-green-500 bg-black/70">
+                                    <h2 className="text-3xl font-bold cyan-neon">&gt;&gt; ANALYSIS OUTPUT</h2>
+                                </div>
+                                <div ref={resultsRef} className="h-[600px] overflow-y-auto p-4 space-y-4 scrollbar-retro">
+                                    {results.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center h-full">
+                                            <div className="text-9xl mb-4 neon-text blink">🧠</div>
+                                            <p className="text-3xl cyan-neon">AWAITING LAUNCH...</p>
+                                            <p className="text-2xl mt-2" style={{color: '#00ff41'}}>READY FOR DEEP SPACE RESEARCH</p>
+                                        </div>
+                                    ) : (
+                                        results.map((result, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={
+                                                    result.isSynthesis 
+                                                        ? 'border-2 border-yellow-400 bg-yellow-900/20 p-4' 
+                                                        : result.isResearch
+                                                        ? 'border-2 border-cyan-400 bg-cyan-900/20 p-4'
+                                                        : result.isCounsel
+                                                        ? 'border-2 border-magenta-400 bg-magenta-900/20 p-4'
+                                                        : result.isVoting
+                                                        ? 'border-2 border-blue-400 bg-blue-900/20 p-4'
+                                                        : 'border-2 border-green-500 bg-black/70 p-4'
+                                                }
+                                            >
+                                                <div className="flex justify-between mb-2">
+                                                    <span className="text-2xl font-bold" style={{
+                                                        color: result.isSynthesis ? '#ffff00' : result.isResearch ? '#00ffff' : result.isCounsel ? '#ff00ff' : result.isVoting ? '#00ccff' : '#00ff41',
+                                                        textShadow: `0 0 10px ${result.isSynthesis ? '#ffff00' : result.isResearch ? '#00ffff' : result.isCounsel ? '#ff00ff' : result.isVoting ? '#00ccff' : '#00ff41'}`
+                                                    }}>
+                                                        {result.agent}
+                                                    </span>
+                                                    <span className="text-xl" style={{color: '#00ff41'}}>[{result.timestamp}]</span>
+                                                </div>
+                                                {result.perspective && (
+                                                    <div className="text-xl mb-2 italic" style={{color: '#00ffff'}}>
+                                                        // {result.perspective}
+                                                    </div>
+                                                )}
+                                                <div className="text-xl whitespace-pre-wrap" style={{color: '#00ff41'}}>
+                                                    {result.content}
+                                                </div>
+                                                
+                                                {/* Voting visualization */}
+                                                {result.isVoting && result.votes && (
+                                                    <div className="mt-4 pt-4 border-t border-blue-700">
+                                                        <p className="text-2xl mb-3 cyan-neon">// DETAILED VOTE BREAKDOWN:</p>
+                                                        {(() => {
+                                                            const voteCounts = {};
+                                                            result.votes.forEach(vote => {
+                                                                voteCounts[vote.voted_for] = (voteCounts[vote.voted_for] || 0) + 1;
+                                                            });
+                                                            const maxVotes = Math.max(...Object.values(voteCounts));
+                                                            
+                                                            return Object.entries(voteCounts).map(([agent, count]) => (
+                                                                <div key={agent} className="mb-3">
+                                                                    <div className="flex justify-between mb-1">
+                                                                        <span className="text-xl yellow-neon">{agent}</span>
+                                                                        <span className="text-xl neon-text">{count} vote{count !== 1 ? 's' : ''}</span>
+                                                                    </div>
+                                                                    <div className="vote-bar">
+                                                                        <div 
+                                                                            className="vote-fill flex items-center px-2"
+                                                                            style={{ 
+                                                                                width: `${(count / maxVotes) * 100}%`,
+                                                                                background: count === maxVotes ? 'linear-gradient(90deg, #ffff00, #ffaa00)' : 'linear-gradient(90deg, #00ff41, #00cc33)'
+                                                                            }}
+                                                                        >
+                                                                            <span className="text-lg font-bold" style={{color: '#000'}}>
+                                                                                {'█'.repeat(count)}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ));
+                                                        })()}
+                                                        
+                                                        <div className="mt-4 p-3 bg-black/50 border border-cyan-500">
+                                                            <p className="text-xl cyan-neon mb-2">// INDIVIDUAL VOTES:</p>
+                                                            {result.votes.map((vote, vidx) => (
+                                                                <p key={vidx} className="text-lg" style={{color: '#00ff41'}}>
+                                                                    [{vote.timestamp}] <span className="magenta-neon">{vote.voter}</span> → <span className="yellow-neon">{vote.voted_for}</span>
+                                                                </p>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                
+                                                {result.sources && result.sources.length > 0 && (
+                                                    <div className="mt-3 pt-3 border-t border-green-700">
+                                                        <p className="text-xl mb-1" style={{color: '#00ffff'}}>// SOURCES:</p>
+                                                        {result.sources.slice(0, 5).map((source, sidx) => (
+                                                            <a
+                                                                key={sidx}
+                                                                href={source}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-lg block mb-1 hover:text-yellow-400"
+                                                                style={{color: '#00ff41'}}
+                                                            >
+                                                                [{sidx + 1}] {source}
+                                                            </a>
+                                                        ))}
+                                                        {result.sources.length > 5 && (
+                                                            <p className="text-lg" style={{color: '#ffff00'}}>
+                                                                + {result.sources.length - 5} more sources
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                    <div ref={resultsEndRef} />
+                                </div>
+                                <button 
+                                    onClick={scrollToBottom}
+                                    className="fixed bottom-4 right-4 retro-btn text-2xl"
+                                    title="Scroll to Bottom"
+                                >
+                                    ↓
+                                </button>
+                            </div>
+
+                            {/* Sources Sidebar */}
+                            <div className="neon-border bg-black/50 terminal-glow">
+                                <div className="p-4 border-b-2 border-green-500 bg-black/70">
+                                    <h2 className="text-3xl font-bold cyan-neon">&gt;&gt; SOURCE DATABASE</h2>
+                                    <p className="text-2xl" style={{color: '#00ff41'}}>[{sources.length} ENTRIES]</p>
+                                </div>
+                                <div className="h-[600px] overflow-y-auto p-4 scrollbar-retro">
+                                    {sources.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center h-full">
+                                            <div className="text-8xl mb-3 blink" style={{color: '#00ffff'}}>◈</div>
+                                            <p className="text-2xl text-center" style={{color: '#00ffff'}}>NO SOURCES LOADED</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {sources.map((source, idx) => (
+                                                <a
+                                                    key={idx}
+                                                    href={source}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="block p-3 bg-black border border-green-700 hover:border-cyan-400 transition-all"
+                                                >
+                                                    <span className="text-xl font-bold" style={{color: '#ffff00'}}>[{idx + 1}]</span>
+                                                    <p className="text-lg break-words" style={{color: '#00ff41'}}>{source}</p>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="mt-4 text-center neon-border bg-black/50 p-3">
+                            <p className="text-2xl neon-text">
+                                LIMERITA DEEP RESEARCH v2.1 | CONNECTED: {selectedModel || 'NO MODEL'} | 
+                                MODE: {mode === 'counsel' ? `COUNSEL [${numMembers} AGENTS] 🗳️` : 'SINGLE PASS'} | 
+                                SYSTEM READY <span className="blink">█</span> 
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
