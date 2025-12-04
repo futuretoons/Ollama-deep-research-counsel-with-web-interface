@@ -43,8 +43,8 @@ AI: Ollama (localhost:11434)
 Search: DuckDuckGo + curated fallbacks
 Storage: Local JSON files
 
-Project Structure
-textAI Counsel.bat      → Windows launcher
+#Project Structure
+AI Counsel.bat      → Windows launcher
 start.py            → Dependency checker + Ollama starter + starts application
 app.py              → Core Flask server + counsel logic
 index.html          → Full frontend (React + retro CRT UI)
@@ -58,7 +58,7 @@ Manual source selection / pinning
 Pre-search query refinement (LLM generates targeted search terms before crawling)
 Real peer evaluation voting (agents critique each other instead of random votes)
 
-Ethical & Legal Use
+#Ethical & Legal Use
 This tool performs web searching and limited content extraction for personal, non-commercial research only.
 
 Respects robots.txt when available
