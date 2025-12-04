@@ -29,7 +29,7 @@ Curated high-quality sources (Wikipedia, Google Scholar, Britannica, Reddit, Sta
 
 All requests include randomized User-Agent, 3–8 second delays, and respect robots.txt when possible.
 Quick Start
-Bashgit clone https://github.com/yourusername/limerita-deep-research.git
+git clone https://github.com/futuretoons/Ollama-deep-research-counsel-with-web-interface/blob/main/README.txt
 cd limerita-deep-research
 Windows: Double-click AI Counsel.bat
 macOS/Linux: python3 start.py
