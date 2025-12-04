@@ -66,18 +66,6 @@ Includes deliberate delays to avoid overloading servers
 You are responsible for complying with each website’s Terms of Service
 Do not use for bulk scraping, spam, or any illegal activity
 
-License
 
-
-
-
-
-
-
-
-
-
-
-
-									-Limerita 2025
+				-Futuretoons aka. Limerita 2025
 ================================
