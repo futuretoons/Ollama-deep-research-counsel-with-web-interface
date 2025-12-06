@@ -2,7 +2,6 @@ import subprocess
 import os
 import sys
 import time
-import requests
 from importlib import import_module
 
 def check_and_install(package, import_name=None):
