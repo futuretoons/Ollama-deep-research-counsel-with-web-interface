@@ -1,3 +1,4 @@
+#Hamburger
 ================================
 1.) Make sure you have Ollama(pull a model) & python / pip installed 
 2.) Run 'AI Counsel.bat' as an administrator
